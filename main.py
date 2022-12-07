@@ -54,7 +54,7 @@ for entry in search_entries:
         element = WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.CLASS_NAME, "blueBarHdPara"))
         )
-        print('Successfully loaded search.')
+        print(f'Successfully loaded search "{entry}".')
     except:
         print('Uh Oh')
 
@@ -68,7 +68,7 @@ for entry in search_entries:
             element = WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
             )
-            print("Entered page")
+            print(f"Entered page {page.text}")
         except:
             print('Uh Oh')
         time.sleep(0.5)
@@ -110,8 +110,19 @@ for entry in search_entries:
                 except:
                     print('Uh Oh, Waiting...')
                     time.sleep(10)
+
+                try:
                     expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
                     expand.click()
+                except:
+                    print('Page is having trouble loading. Last try.')
+                    time.sleep(10)
+                try:
+                    expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
+                    expand.click()
+                except:
+                    print("Can't load elements. Skipping record")
+                    continue
                 # print(detail_row)
                 try:
                     element = WebDriverWait(driver, 15).until(
@@ -183,8 +194,18 @@ for entry in search_entries:
                 except:
                     print('Uh Oh, Waiting...')
                     time.sleep(10)
+                try:
                     expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
                     expand.click()
+                except:
+                    print('Page is having trouble loading. Last try.')
+                    time.sleep(10)
+                try:
+                    expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
+                    expand.click()
+                except:
+                    print("Can't load elements. Skipping record")
+                    continue
                 # print(detail_row)
                 try:
                     element = WebDriverWait(driver, 15).until(

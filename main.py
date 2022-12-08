@@ -26,7 +26,10 @@ options.add_argument("--window-size=1920,1200")
 options.add_experimental_option("detach", True)
 
 DRIVER_PATH = '/path/to/chromedriver'
+
+# To view with window closed (top) or open (bottom)
 driver = webdriver.Chrome(options=options, executable_path=DRIVER_PATH)
+# driver = webdriver.Chrome(executable_path=DRIVER_PATH)
 
 driver.get('https://legaldirectory.malaysianbar.org.my/')
 
@@ -56,7 +59,15 @@ for entry in search_entries:
         )
         print(f'Successfully loaded search "{entry}".')
     except:
-        print('Uh Oh')
+        print('Uh Oh, Trying again...')
+        time.sleep(10)
+        try:
+            element = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "blueBarHdPara"))
+            )
+            print(f'Successfully loaded search "{entry}".')
+        except:
+            print('Search failed...Retry program')
 
     pages = driver.find_elements(By.XPATH, '//*[@id="firmpage"]/option')
     for page in pages:
@@ -64,6 +75,8 @@ for entry in search_entries:
         detail_row = 0
         next_page = Select(driver.find_element(By.XPATH, '//*[@id="firmpage"]'))
         next_page.select_by_value(page.text)
+
+        # LOADING PAGE---------------------------------------------------------------------------------------------
         try:
             element = WebDriverWait(driver, 15).until(
                 EC.presence_of_element_located((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
@@ -71,30 +84,50 @@ for entry in search_entries:
             print(f"Entered page {page.text}")
         except:
             print('Uh Oh, Waiting...')
-            time.sleep(10)
-        try:
-            element = WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
-            )
-            print(f"Entered page {page.text}")
-        except:
-            print('Trouble loading page. Last try...')
-            time.sleep(10)
-        try:
-            element = WebDriverWait(driver, 15).until(
-                EC.presence_of_element_located((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
-            )
-            print(f"Entered page {page.text}")
-        except:
-            print('Could not load. Skipping page')
-            continue
+            time.sleep(5)
+            try:
+                element = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
+                )
+                print(f"Entered page {page.text}")
+            except:
+                print('Trouble loading page. Last try...')
+                time.sleep(10)
+                try:
+                    element = WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
+                    )
+                    print(f"Entered page {page.text}")
+                except:
+                    print('Could not load. Skipping page...')
+                    continue
         time.sleep(0.5)
 
+        # FINDING FIRMS--------------------------------------------------------------------------------------------
         try:
+            element = WebDriverWait(driver, 15).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "tblRow"))
+            )
             firms = driver.find_elements(By.CLASS_NAME, "tblRow")
         except:
-            print('Firms not found. Skipping page...')
-            continue
+            print('Uh Oh, Waiting...')
+            time.sleep(5)
+            try:
+                element = WebDriverWait(driver, 15).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, "tblRow"))
+                )
+                firms = driver.find_elements(By.CLASS_NAME, "tblRow")
+            except:
+                print('Trouble loading firms. Last try...')
+                time.sleep(10)
+                try:
+                    element = WebDriverWait(driver, 15).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, "tblRow"))
+                    )
+                    firms = driver.find_elements(By.CLASS_NAME, "tblRow")
+                except:
+                    print('Could not load firms. Skipping page....')
+                    continue
 
         if record_count < 990:
             ID_number = 2
@@ -111,29 +144,29 @@ for entry in search_entries:
                                                 f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
-                    )
-                    title = driver.find_element(By.XPATH,
-                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
-                except:
-                    print('Trouble Loading Title. Last try...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
-                    )
-                    title = driver.find_element(By.XPATH,
-                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
-                except:
-                    print("Could not load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.XPATH,
+                                                            f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
+                        )
+                        title = driver.find_element(By.XPATH,
+                                                    f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
+                    except:
+                        print('Trouble Loading Title. Last try...')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.XPATH,
+                                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
+                            )
+                            title = driver.find_element(By.XPATH,
+                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
+                        except:
+                            print("Could not load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
                 firm_details.append(title.text)
 
                 # CONTACT--------------------------------------------------------------------------------------------
@@ -146,29 +179,29 @@ for entry in search_entries:
                                                   f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
-                    )
-                    contact = driver.find_element(By.XPATH,
-                                                  f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
-                except:
-                    print('Trouble Loading contacts. Last try...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
-                    )
-                    contact = driver.find_element(By.XPATH,
-                                                  f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
-                except:
-                    print("Can't load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.XPATH,
+                                                            f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
+                        )
+                        contact = driver.find_element(By.XPATH,
+                                                      f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
+                    except:
+                        print('Trouble Loading contacts. Last try...')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.XPATH,
+                                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
+                            )
+                            contact = driver.find_element(By.XPATH,
+                                                          f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
+                        except:
+                            print("Can't load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
                 firm_details.append(contact.text)
 
                 # DROPDOWN--------------------------------------------------------------------------------------------
@@ -180,21 +213,21 @@ for entry in search_entries:
                     expand.click()
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
-                    expand.click()
-                except:
-                    print('Page is having trouble loading. Last try.')
-                    time.sleep(10)
-                try:
-                    expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
-                    expand.click()
-                except:
-                    print("Can't expand dropdown. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
+                        expand.click()
+                    except:
+                        print('Page is having trouble loading. Last try.')
+                        time.sleep(10)
+                        try:
+                            expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
+                            expand.click()
+                        except:
+                            print("Can't expand dropdown. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
 
                 # DETAILS--------------------------------------------------------------------------------------------
                 try:
@@ -204,25 +237,25 @@ for entry in search_entries:
                     details = driver.find_element(By.ID, f"fpDetail{detail_row}")
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
-                    )
-                    details = driver.find_element(By.ID, f"fpDetail{detail_row}")
-                except:
-                    print('Trouble loading details. Last try.')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
-                    )
-                    details = driver.find_element(By.ID, f"fpDetail{detail_row}")
-                except:
-                    print("Can't load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
+                        )
+                        details = driver.find_element(By.ID, f"fpDetail{detail_row}")
+                    except:
+                        print('Trouble loading details. Last try.')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
+                            )
+                            details = driver.find_element(By.ID, f"fpDetail{detail_row}")
+                        except:
+                            print("Can't load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
 
                 # COLUMNS--------------------------------------------------------------------------------------------
                 try:
@@ -232,25 +265,25 @@ for entry in search_entries:
                     col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
-                    )
-                    col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
-                except:
-                    print('Trouble Loading Columns. Last try.')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
-                    )
-                    col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
-                except:
-                    print("Can't load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
+                        )
+                        col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
+                    except:
+                        print('Trouble Loading Columns. Last try.')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
+                            )
+                            col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
+                        except:
+                            print("Can't load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
 
                 # Appending--------------------------------------------------------------------------------------------
                 for c in col:
@@ -281,29 +314,29 @@ for entry in search_entries:
                                                 f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
-                    )
-                    title = driver.find_element(By.XPATH,
-                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
-                except:
-                    print('Trouble Loading Title. Last try...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
-                    )
-                    title = driver.find_element(By.XPATH,
-                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
-                except:
-                    print("Could not load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.XPATH,
+                                                            f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
+                        )
+                        title = driver.find_element(By.XPATH,
+                                                    f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
+                    except:
+                        print('Trouble Loading Title. Last try...')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.XPATH,
+                                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
+                            )
+                            title = driver.find_element(By.XPATH,
+                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
+                        except:
+                            print("Could not load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
                 firm_details.append(title.text)
 
                 # CONTACT--------------------------------------------------------------------------------------------
@@ -316,29 +349,29 @@ for entry in search_entries:
                                                   f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
-                    )
-                    contact = driver.find_element(By.XPATH,
-                                                  f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
-                except:
-                    print('Trouble Loading contacts. Last try...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH,
-                                                        f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
-                    )
-                    contact = driver.find_element(By.XPATH,
-                                                  f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
-                except:
-                    print("Can't load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.XPATH,
+                                                            f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
+                        )
+                        contact = driver.find_element(By.XPATH,
+                                                      f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
+                    except:
+                        print('Trouble Loading contacts. Last try...')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.XPATH,
+                                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]'))
+                            )
+                            contact = driver.find_element(By.XPATH,
+                                                          f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
+                        except:
+                            print("Can't load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
                 firm_details.append(contact.text)
 
                 # DROPDOWN--------------------------------------------------------------------------------------------
@@ -350,21 +383,21 @@ for entry in search_entries:
                     expand.click()
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
-                    expand.click()
-                except:
-                    print('Page is having trouble loading. Last try.')
-                    time.sleep(10)
-                try:
-                    expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
-                    expand.click()
-                except:
-                    print("Can't expand dropdown. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
+                        expand.click()
+                    except:
+                        print('Page is having trouble loading. Last try.')
+                        time.sleep(10)
+                        try:
+                            expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
+                            expand.click()
+                        except:
+                            print("Can't expand dropdown. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
 
                 # DETAILS--------------------------------------------------------------------------------------------
                 try:
@@ -374,25 +407,25 @@ for entry in search_entries:
                     details = driver.find_element(By.ID, f"fpDetail{detail_row}")
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
-                    )
-                    details = driver.find_element(By.ID, f"fpDetail{detail_row}")
-                except:
-                    print('Trouble loading details. Last try.')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
-                    )
-                    details = driver.find_element(By.ID, f"fpDetail{detail_row}")
-                except:
-                    print("Can't load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
+                        )
+                        details = driver.find_element(By.ID, f"fpDetail{detail_row}")
+                    except:
+                        print('Trouble loading details. Last try.')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.ID, f"fpDetail{detail_row}"))
+                            )
+                            details = driver.find_element(By.ID, f"fpDetail{detail_row}")
+                        except:
+                            print("Can't load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
 
                 # COLUMNS--------------------------------------------------------------------------------------------
                 try:
@@ -402,25 +435,25 @@ for entry in search_entries:
                     col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
                 except:
                     print('Uh Oh, Waiting...')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
-                    )
-                    col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
-                except:
-                    print('Trouble Loading Columns. Last try.')
-                    time.sleep(10)
-                try:
-                    element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
-                    )
-                    col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
-                except:
-                    print("Can't load elements. Skipping record")
-                    detail_row += 1
-                    ID_number += 2
-                    continue
+                    time.sleep(5)
+                    try:
+                        element = WebDriverWait(driver, 15).until(
+                            EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
+                        )
+                        col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
+                    except:
+                        print('Trouble Loading Columns. Last try.')
+                        time.sleep(10)
+                        try:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.presence_of_element_located((By.CLASS_NAME, 'ctblCol2'))
+                            )
+                            col = details.find_elements(By.CLASS_NAME, 'ctblCol2')
+                        except:
+                            print("Can't load elements. Skipping record")
+                            detail_row += 1
+                            ID_number += 2
+                            continue
 
                 # Appending--------------------------------------------------------------------------------------------
                 for c in col:

@@ -167,7 +167,19 @@ for entry in search_entries:
                             detail_row += 1
                             ID_number += 2
                             continue
-                firm_details.append(title.text)
+                try:
+                    firm_details.append(title.text)
+                except:
+                    print('Dude failed to append title. Trying again')
+                    title = driver.find_element(By.XPATH,
+                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
+                    time.sleep(5)
+                try:
+                    firm_details.append(title.text)
+                except:
+                    print('Nah shitty website. Skipping record')
+                    continue
+
 
                 # CONTACT--------------------------------------------------------------------------------------------
                 try:
@@ -202,7 +214,20 @@ for entry in search_entries:
                             detail_row += 1
                             ID_number += 2
                             continue
-                firm_details.append(contact.text)
+
+
+                try:
+                    firm_details.append(contact.text)
+                except:
+                    print('Dude failed to append contact. Trying again')
+                    contact = driver.find_element(By.XPATH,
+                                                  f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
+                    time.sleep(5)
+                try:
+                    firm_details.append(contact.text)
+                except:
+                    print('Nah shitty website. Skipping record')
+                    continue
 
                 # DROPDOWN--------------------------------------------------------------------------------------------
                 try:
@@ -337,7 +362,19 @@ for entry in search_entries:
                             detail_row += 1
                             ID_number += 2
                             continue
-                firm_details.append(title.text)
+
+                try:
+                    firm_details.append(title.text)
+                except:
+                    print('Dude failed to append title. Trying again')
+                    title = driver.find_element(By.XPATH,
+                                                f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
+                    time.sleep(5)
+                try:
+                    firm_details.append(title.text)
+                except:
+                    print('Nah shitty website. Skipping record')
+                    continue
 
                 # CONTACT--------------------------------------------------------------------------------------------
                 try:
@@ -372,7 +409,18 @@ for entry in search_entries:
                             detail_row += 1
                             ID_number += 2
                             continue
-                firm_details.append(contact.text)
+                try:
+                    firm_details.append(contact.text)
+                except:
+                    print('Dude failed to append contact. Trying again')
+                    contact = driver.find_element(By.XPATH,
+                                                  f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[4]/div[2]')
+                    time.sleep(5)
+                try:
+                    firm_details.append(contact.text)
+                except:
+                    print('Nah shitty website. Skipping record')
+                    continue
 
                 # DROPDOWN--------------------------------------------------------------------------------------------
                 try:

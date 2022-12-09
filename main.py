@@ -141,23 +141,26 @@ for entry in search_entries:
 
         if record_count < 990:
             ID_number = 2
+            fail_count = 0
             for firm in firms:
-
                 firm_details = []
 
                 # TITLE--------------------------------------------------------------------------------------------
                 try:
-                    element = WebDriverWait(driver, 15).until(
+                    element = WebDriverWait(driver, 5).until(
                         EC.presence_of_element_located((By.XPATH,
                                                         f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
                     )
                     title = driver.find_element(By.XPATH,
                                                 f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                 except:
+                    if fail_count > 1:
+                        print("No records found.")
+                        continue
                     print('Uh Oh, Waiting (3)...')
-                    time.sleep(5)
+                    time.sleep(2)
                     try:
-                        element = WebDriverWait(driver, 15).until(
+                        element = WebDriverWait(driver, 5).until(
                             EC.presence_of_element_located((By.XPATH,
                                                             f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
                         )
@@ -165,15 +168,16 @@ for entry in search_entries:
                                                     f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                     except:
                         print('Trouble Loading Title. Last try...')
-                        time.sleep(10)
+                        time.sleep(3)
                         try:
-                            element = WebDriverWait(driver, 15).until(
+                            element = WebDriverWait(driver, 5).until(
                                 EC.presence_of_element_located((By.XPATH,
                                                                 f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
                             )
                             title = driver.find_element(By.XPATH,
                                                         f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                         except:
+                            fail_count += 1
                             print("No records found. Skipping record")
                             detail_row += 1
                             ID_number += 2
@@ -243,28 +247,31 @@ for entry in search_entries:
                 # DROPDOWN--------------------------------------------------------------------------------------------
                 try:
                     element = WebDriverWait(driver, 15).until(
-                        EC.presence_of_element_located((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
-                    )
-                    expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
-                    expand.click()
+                        EC.element_to_be_clickable((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
+                    ).click()
                 except:
                     print('Uh Oh, Waiting (5)...')
                     time.sleep(5)
                     try:
-                        expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
-                        time.sleep(0.3)
-                        expand.click()
+                        element = WebDriverWait(driver, 15).until(
+                            EC.element_to_be_clickable((By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
+                        ).click()
                     except:
                         print('Page is having trouble loading. Last try.')
                         time.sleep(5)
                         try:
-                            expand = driver.find_element(By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]')
-                            time.sleep(0.3)
-                            expand.click()
-                        except:
+                            element = WebDriverWait(driver, 15).until(
+                                EC.element_to_be_clickable(
+                                    (By.XPATH, f'// *[ @ id = "fpDetailIcon{detail_row}"]'))
+                            ).click()
+                        except Exception as e:
                             print("Can't expand dropdown. Skipping record")
+                            print('Error! Code: {c}, Message, {m}'.format(c=type(e).__name__, m=str(e)))
+                            print(detail_row, "Detail row")
+                            print(ID_number, "ID")
                             detail_row += 1
                             ID_number += 2
+
                             continue
 
                 # DETAILS--------------------------------------------------------------------------------------------
@@ -339,22 +346,26 @@ for entry in search_entries:
             file_number += 1
             createFile(file_number)
             ID_number = 2
+            fail_count = 0
             for firm in firms:
                 firm_details = []
 
                 # TITLE--------------------------------------------------------------------------------------------
                 try:
-                    element = WebDriverWait(driver, 15).until(
+                    element = WebDriverWait(driver, 5).until(
                         EC.presence_of_element_located((By.XPATH,
                                                         f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
                     )
                     title = driver.find_element(By.XPATH,
                                                 f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                 except:
-                    print('Uh Oh, Waiting...')
-                    time.sleep(5)
+                    if fail_count > 2:
+                        print("No records found. Skipping record")
+                        continue
+                    print('Uh Oh, Waiting (3)...')
+                    time.sleep(2)
                     try:
-                        element = WebDriverWait(driver, 15).until(
+                        element = WebDriverWait(driver, 5).until(
                             EC.presence_of_element_located((By.XPATH,
                                                             f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
                         )
@@ -362,16 +373,17 @@ for entry in search_entries:
                                                     f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                     except:
                         print('Trouble Loading Title. Last try...')
-                        time.sleep(10)
+                        time.sleep(3)
                         try:
-                            element = WebDriverWait(driver, 15).until(
+                            element = WebDriverWait(driver, 5).until(
                                 EC.presence_of_element_located((By.XPATH,
                                                                 f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span'))
                             )
                             title = driver.find_element(By.XPATH,
                                                         f'//*[@id="firmResultPanel"]/div[1]/div[{ID_number}]/div[1]/span')
                         except:
-                            print("Could not load elements. Skipping record")
+                            fail_count += 1
+                            print("No records found. Skipping record")
                             detail_row += 1
                             ID_number += 2
                             continue

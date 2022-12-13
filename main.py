@@ -38,6 +38,7 @@ file_number = 1
 file = open(f'Law Firms {file_number}.csv', 'w', encoding='utf8', newline='')
 writer = csv.writer(file)
 
+
 # writer header rows
 writer.writerow(["Company", "Phone", "Street", "Email", "Website", "Last Name", "Description", "Lead Source", "Industry"])
 
